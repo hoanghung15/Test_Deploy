@@ -10,7 +10,11 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-    # Đã bỏ healthcheck ở đây
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   springboot-app:
     build: .
@@ -23,7 +27,7 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
     depends_on:
-      - mysql  # Dùng kiểu đơn giản, không kiểm tra health
-
+      mysql:
+        condition: service_healthy
 volumes:
   mysql_data:
