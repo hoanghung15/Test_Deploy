@@ -10,12 +10,11 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-    # XÓA hoặc COMMENT phần này nếu muốn bỏ qua healthcheck
-    # healthcheck:
-    #   test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-    #   interval: 5s
-    #   timeout: 5s
-    #   retries: 10
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   springboot-app:
     build: .
@@ -27,9 +26,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql_container:3306/identity_service
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-    # Gỡ phần condition nếu không dùng healthcheck
     depends_on:
-      - mysql
-
+      mysql:
+        condition: service_healthy
 volumes:
   mysql_data:
